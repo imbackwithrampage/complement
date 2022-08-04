@@ -54,7 +54,7 @@ func TestUploadKey(t *testing.T) {
 
 		// sytest: Rejects invalid device keys
 		t.Run("Rejects invalid device keys", func(t *testing.T) {
-			runtime.SkipIf(t, runtime.Dendrite, runtime.Synapse) // Blacklisted on Synapse, Dendrite FIXME: https://github.com/matrix-org/dendrite/issues/2804
+			runtime.SkipIf(t, runtime.Dendrite, runtime.Synapse, runtime.Hungryserv) // Blacklisted on Synapse, Dendrite FIXME: https://github.com/matrix-org/dendrite/issues/2804
 			t.Parallel()
 			// algorithms, keys and signatures are required fields, but missing
 			reqBody := client.WithJSONBody(t, map[string]interface{}{
@@ -75,7 +75,7 @@ func TestUploadKey(t *testing.T) {
 
 		// sytest: Should reject keys claiming to belong to a different user
 		t.Run("Should reject keys claiming to belong to a different user", func(t *testing.T) {
-			runtime.SkipIf(t, runtime.Synapse) // Blacklisted
+			runtime.SkipIf(t, runtime.Synapse, runtime.Hungryserv) // Blacklisted
 			t.Parallel()
 			reqBody := client.WithJSONBody(t, map[string]interface{}{
 				"device_keys": map[string]interface{}{

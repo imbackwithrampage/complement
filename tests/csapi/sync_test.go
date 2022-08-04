@@ -202,7 +202,7 @@ func TestSync(t *testing.T) {
 		})
 		// sytest: Newly joined room includes presence in incremental sync
 		t.Run("Newly joined room includes presence in incremental sync", func(t *testing.T) {
-			runtime.SkipIf(t, runtime.Dendrite) // FIXME: https://github.com/matrix-org/dendrite/issues/1324
+			runtime.SkipIf(t, runtime.Dendrite, runtime.Hungryserv) // FIXME: https://github.com/matrix-org/dendrite/issues/1324
 			roomID := alice.CreateRoom(t, map[string]interface{}{"preset": "public_chat"})
 			alice.MustSyncUntil(t, client.SyncReq{}, client.SyncJoinedTo(alice.UserID, roomID))
 			_, nextBatch := bob.MustSync(t, client.SyncReq{})

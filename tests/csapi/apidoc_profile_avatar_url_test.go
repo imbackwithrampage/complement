@@ -7,6 +7,7 @@ import (
 	"github.com/matrix-org/complement/internal/client"
 	"github.com/matrix-org/complement/internal/match"
 	"github.com/matrix-org/complement/internal/must"
+	"github.com/matrix-org/complement/runtime"
 )
 
 func TestProfileAvatarURL(t *testing.T) {
@@ -29,6 +30,7 @@ func TestProfileAvatarURL(t *testing.T) {
 
 	// sytest: GET /profile/:user_id/avatar_url publicly accessible
 	t.Run("GET /profile/:user_id/avatar_url publicly accessible", func(t *testing.T) {
+		runtime.SkipIf(t, runtime.Hungryserv) // This is a stupid spec requirement
 		res := unauthedClient.DoFunc(t, "GET", []string{"_matrix", "client", "v3", "profile", authedClient.UserID, "avatar_url"})
 
 		must.MatchResponse(t, res, match.HTTPResponse{

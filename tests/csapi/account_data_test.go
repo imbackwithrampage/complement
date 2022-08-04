@@ -6,6 +6,7 @@ import (
 	"github.com/matrix-org/complement/internal/b"
 	"github.com/matrix-org/complement/internal/match"
 	"github.com/matrix-org/complement/internal/must"
+	"github.com/matrix-org/complement/runtime"
 )
 
 func TestAddAccountData(t *testing.T) {
@@ -17,6 +18,7 @@ func TestAddAccountData(t *testing.T) {
 	// sytest: Can add account data
 	// sytest: Can get account data without syncing
 	t.Run("Can add global account data", func(t *testing.T) {
+		runtime.SkipIf(t, runtime.Hungryserv)
 		// Set the account data entry
 		alice.SetGlobalAccountData(t, "test.key", map[string]interface{}{"value": "first"})
 
