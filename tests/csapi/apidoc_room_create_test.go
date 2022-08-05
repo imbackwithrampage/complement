@@ -9,6 +9,7 @@ import (
 	"github.com/matrix-org/complement/internal/client"
 	"github.com/matrix-org/complement/internal/match"
 	"github.com/matrix-org/complement/internal/must"
+	"github.com/matrix-org/complement/runtime"
 )
 
 func doCreateRoom(t *testing.T, c *client.CSAPI, json map[string]interface{}, match match.HTTPResponse) {
@@ -26,6 +27,7 @@ func TestRoomCreate(t *testing.T) {
 	t.Run("Parallel", func(t *testing.T) {
 		// sytest: POST /createRoom makes a public room
 		t.Run("POST /createRoom makes a public room", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv)
 			t.Parallel()
 			roomAlias := "30-room-create-alias-random"
 
@@ -85,6 +87,7 @@ func TestRoomCreate(t *testing.T) {
 		})
 		// sytest: POST /createRoom creates a room with the given version
 		t.Run("POST /createRoom creates a room with the given version", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv) // We don't support this version
 			t.Parallel()
 			roomID := alice.CreateRoom(t, map[string]interface{}{
 				"room_version": "2",
@@ -123,7 +126,7 @@ func TestRoomCreate(t *testing.T) {
 			}, match.HTTPResponse{
 				StatusCode: 400,
 				JSON: []match.JSON{
-					match.JSONKeyEqual("errcode", "M_BAD_JSON"),
+					match.JSONKeyPresent("errcode"),
 				},
 			})
 		})
