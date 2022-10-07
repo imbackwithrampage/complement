@@ -136,12 +136,13 @@ func TestRoomsInvite(t *testing.T) {
 			roomID := alice.CreateRoom(t, map[string]interface{}{
 				"preset": "private_chat",
 			})
+			_, nextBatch := alice.MustSync(t, client.SyncReq{})
 
 			// Invite & join bob
 			alice.InviteRoom(t, roomID, bob.UserID)
 			bob.MustSyncUntil(t, client.SyncReq{}, client.SyncInvitedTo(bob.UserID, roomID))
 			bob.JoinRoom(t, roomID, []string{})
-			alice.MustSyncUntil(t, client.SyncReq{}, client.SyncInvitedTo(bob.UserID, roomID))
+			alice.MustSyncUntil(t, client.SyncReq{Since: nextBatch}, client.SyncInvitedTo(bob.UserID, roomID))
 
 			// Raise the powerlevel
 			reqBody := client.WithJSONBody(t, map[string]interface{}{
