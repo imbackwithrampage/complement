@@ -132,6 +132,7 @@ func TestRoomCreate(t *testing.T) {
 		})
 		// sytest: POST /createRoom rejects attempts to create rooms with unknown versions
 		t.Run("POST /createRoom rejects attempts to create rooms with unknown versions", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv) // Hungryserv really doesn't care and will always return version 9
 			t.Parallel()
 
 			doCreateRoom(t, alice, map[string]interface{}{
