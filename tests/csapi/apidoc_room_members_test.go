@@ -9,6 +9,7 @@ import (
 	"github.com/matrix-org/complement/internal/client"
 	"github.com/matrix-org/complement/internal/match"
 	"github.com/matrix-org/complement/internal/must"
+	"github.com/matrix-org/complement/runtime"
 )
 
 func TestRoomMembers(t *testing.T) {
@@ -39,6 +40,7 @@ func TestRoomMembers(t *testing.T) {
 		})
 		// sytest: POST /join/:room_alias can join a room
 		t.Run("POST /join/:room_alias can join a room", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv) // Hungryserv doesn't support aliases
 			t.Parallel()
 			roomID := alice.CreateRoom(t, map[string]interface{}{
 				"visibility":      "public",
@@ -135,6 +137,7 @@ func TestRoomMembers(t *testing.T) {
 		})
 		// sytest: POST /join/:room_id can join a room with custom content
 		t.Run("POST /join/:room_id can join a room with custom content", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv) // Hungryserv doesn't support custom content on /join
 			t.Parallel()
 			roomID := alice.CreateRoom(t, map[string]interface{}{
 				"visibility": "public",
@@ -166,6 +169,7 @@ func TestRoomMembers(t *testing.T) {
 		})
 		// sytest: POST /join/:room_alias can join a room with custom content
 		t.Run("POST /join/:room_alias can join a room with custom content", func(t *testing.T) {
+			runtime.SkipIf(t, runtime.Hungryserv) // Hungryserv doesn't support aliases
 			t.Parallel()
 			roomID := alice.CreateRoom(t, map[string]interface{}{
 				"visibility":      "public",
