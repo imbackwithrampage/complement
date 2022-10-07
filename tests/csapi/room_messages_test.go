@@ -1,6 +1,7 @@
 package csapi_tests
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,7 +32,7 @@ func TestSendAndFetchMessage(t *testing.T) {
 	_, token := alice.MustSync(t, client.SyncReq{})
 
 	// first use the non-txn endpoint
-	alice.MustDoFunc(t, "POST", []string{"_matrix", "client", "v3", "rooms", roomID, "send", "m.room.message"}, client.WithJSONBody(t, map[string]interface{}{
+	alice.MustDoFunc(t, "PUT", []string{"_matrix", "client", "v3", "rooms", roomID, "send", "m.room.message", "1"}, client.WithJSONBody(t, map[string]interface{}{
 		"msgtype": "m.text",
 		"body":    testMessage,
 	}))
@@ -49,12 +50,27 @@ func TestSendAndFetchMessage(t *testing.T) {
 	must.MatchResponse(t, res, match.HTTPResponse{
 		StatusCode: http.StatusOK,
 		JSON: []match.JSON{
-			match.JSONArrayEach("chunk", func(r gjson.Result) error {
-				if r.Get("type").Str == "m.room.message" && r.Get("content").Get("body").Str == testMessage {
-					return nil
+			func(body []byte) error {
+				chunk := gjson.GetBytes(body, "chunk")
+				if !chunk.Exists() {
+					return errors.New("chunk missing")
 				}
-				return fmt.Errorf("did not find correct event")
-			}),
+				if !chunk.IsArray() {
+					return errors.New("chunk is not an array")
+				}
+				found := false
+				chunk.ForEach(func(_, r gjson.Result) bool {
+					if r.Get("type").Str == "m.room.message" && r.Get("content").Get("body").Str == testMessage {
+						found = true
+						return false
+					}
+					return true
+				})
+				if !found {
+					return errors.New("message not found in chunk")
+				}
+				return nil
+			},
 		},
 	})
 }
