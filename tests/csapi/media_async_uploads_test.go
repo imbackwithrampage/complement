@@ -1,6 +1,7 @@
 package csapi_tests
 
 import (
+	"bytes"
 	"net/http"
 	"strings"
 	"testing"
@@ -36,11 +37,23 @@ func TestAsyncUpload(t *testing.T) {
 		}
 	})
 
+	wantContentType := "image/png"
+
 	t.Run("Upload media", func(t *testing.T) {
-		alice.UploadMediaAsync(t, origin, mediaID, data.MatrixPng, "test.png", "image/png")
+		alice.UploadMediaAsync(t, origin, mediaID, data.MatrixPng, "test.png", wantContentType)
 	})
 
 	t.Run("Cannot upload to a media ID that has already been uploaded to", func(t *testing.T) {
-		alice.UploadMediaAsync(t, origin, mediaID, data.MatrixPng, "test.png", "image/png")
+		alice.UploadMediaAsync(t, origin, mediaID, data.MatrixPng, "test.png", wantContentType)
+	})
+
+	t.Run("Download media", func(t *testing.T) {
+		content, contentType := alice.DownloadContent(t, mxcURI)
+		if !bytes.Equal(data.MatrixPng, content) {
+			t.Fatalf("uploaded and downloaded content doesn't match: want %v\ngot\n%v", data.MatrixPng, content)
+		}
+		if contentType != wantContentType {
+			t.Fatalf("expected contentType to be %s, got %s", wantContentType, contentType)
+		}
 	})
 }
